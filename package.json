@@ -2,23 +2,25 @@
   "name": "relign",
   "version": "0.11.0",
   "description": "Relign is a control flow library for promises heavily inspired by async",
-  "main": "index.js",
+  "main": "./index.js",
   "scripts": {
-    "test": "mocha --bail test/*.spec.js",
-    "cover": "istanbul cover _mocha test/*.spec.js"
+    "build": "tsc",
+    "test": "jest"
   },
+  "pre-commit": [
+    "test",
+    "build"
+  ],
   "author": "Robert Hurst <robertwhurst@gmail.com>",
   "license": "MIT",
-  "devDependencies": {
-    "istanbul": "^0.4.5",
-    "mocha": "^3.1.2",
-    "pre-commit": "^1.2.2",
-    "sinon": "^1.17.6"
-  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/RobertWHurst/relign.git"
   },
+  "bugs": {
+    "url": "https://github.com/RobertWHurst/relign/issues"
+  },
+  "homepage": "https://github.com/RobertWHurst/relign#readme",
   "keywords": [
     "async",
     "control flow",
@@ -28,25 +30,23 @@
     "parallel",
     "series",
     "async map",
-    "map"
+    "map",
+    "typescript"
   ],
-  "bugs": {
-    "url": "https://github.com/RobertWHurst/relign/issues"
-  },
-  "homepage": "https://github.com/RobertWHurst/relign#readme",
-  "browserify": {
-    "transform": [
-      [
-        "babelify",
-        {
-          "presets": [
-            "env"
-          ]
-        }
-      ]
-    ]
-  },
-  "pre-commit": [
-    "test"
-  ]
+  "devDependencies": {
+    "@types/jest": "^24.0.23",
+    "@types/node": "^12.12.20",
+    "@typescript-eslint/eslint-plugin": "^2.12.0",
+    "@typescript-eslint/parser": "^2.12.0",
+    "eslint": "^6.7.2",
+    "eslint-config-standard": "^14.1.0",
+    "eslint-plugin-import": "^2.19.1",
+    "eslint-plugin-node": "^10.0.0",
+    "eslint-plugin-promise": "^4.2.1",
+    "eslint-plugin-standard": "^4.0.1",
+    "jest": "^24.9.0",
+    "pre-commit": "^1.2.2",
+    "ts-jest": "^24.2.0",
+    "typescript": "^3.7.3"
+  }
 }

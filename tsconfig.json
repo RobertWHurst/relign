@@ -1,0 +1,11 @@
+{
+  "compilerOptions": {
+    "strict": true,
+    "moduleResolution": "node",
+    "target": "es5",
+    "outDir": "./",
+    "lib": ["ES7"]
+  },
+  "include": ["./src/**/*"],
+  "exclude": ["./node_modules"]
+}

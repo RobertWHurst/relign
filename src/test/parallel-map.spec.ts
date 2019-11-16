@@ -1,39 +1,36 @@
-const assert      = require('assert');
-const setTimeout  = require('../set-timeout');
-const parallelMap = require('../parallel-map');
-
+import { setTimeout } from '../set-timeout'
+import { parallelMap } from '../parallel-map'
 
 describe('parallelMap(items, worker(item) -> promise(val)) -> promise(val)', () => {
-
   it('processes item arrays, executing the worker on each item and resolves the mapped results', () => {
-    const items = [1, 2, 3, 4];
+    const items = [1, 2, 3, 4]
     return parallelMap(items, i => setTimeout(() => i + 1, 10)).then(d =>
-      assert.deepEqual(d, [2, 3, 4, 5]));
-  });
+      expect(d).toEqual([2, 3, 4, 5]))
+  })
 
   it('processes item objects, executing the worker on each item and resolves the mapped results', () => {
-    const items = { a: 1, b: 2, c: 3, d: 4 };
+    const items = { a: 1, b: 2, c: 3, d: 4 }
     return parallelMap(items, i => setTimeout(() => i + 1, 10)).then(d =>
-      assert.deepEqual(d, { a: 2, b: 3, c: 4, d: 5 }));
-  });
+      expect(d).toEqual({ a: 2, b: 3, c: 4, d: 5 }))
+  })
 
   it('can handle empty items array', () => {
-    const items = [];
+    const items = []
     return parallelMap(items, i => i).then(r =>
-      assert.deepEqual(r, []));
-  });
+      expect(r).toEqual([]))
+  })
 
   it('can handle empty items object', () => {
-    const items = {};
+    const items = {}
     return parallelMap(items, i => i).then(r =>
-      assert.deepEqual(r, {}));
-  });
+      expect(r).toEqual({}))
+  })
 
   it('passes the itemIndex and items array as a second and third argument', () => {
-    const items = [0, 1, 2];
+    const items = [0, 1, 2]
     return parallelMap(items, (item, index, _items) => {
-      assert.equal(item, index);
-      assert.equal(items, _items);
-    });
-  });
-});
+      expect(item).toBe(index)
+      expect(items).toBe(_items)
+    })
+  })
+})

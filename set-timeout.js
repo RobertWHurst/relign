@@ -1,64 +1,64 @@
-const exec = require('./exec');
-
-
-class TimeoutPromise extends Promise {
-
-  constructor(fn, duration) {
-    if (typeof fn === 'number') {
-      duration = fn;
-      fn       = undefined;
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+var exec_1 = require("./exec");
+var TimeoutPromise = /** @class */ (function () {
+    function TimeoutPromise(executorOrPromise) {
+        this._promise = executorOrPromise instanceof Promise
+            ? executorOrPromise
+            : new Promise(executorOrPromise);
     }
-    let timeoutData = null;
-    super((resolve, reject) => {
-      timeoutData = { resolve, reject, fn, duration };
-      if (typeof duration === 'number') {
-        timeoutData.timeoutId = global.setTimeout(() => {
-          exec(fn).then(resolve).catch(reject);
-        }, duration);
-      } else {
-        fn(resolve, reject);
-      }
-    });
-
-    this._parent      = null;
-    this._timeoutData = timeoutData;
-  }
-
-  get _timeoutData() {
-    return this._parent ? this._parent._timeoutData : this.__timeoutData;
-  }
-
-  set _timeoutData(timeoutData) {
-    this.__timeoutData = timeoutData;
-  }
-
-  then(resolve, reject) {
-    const promise   = super.then(resolve, reject);
-    promise._parent = this;
-    return promise;
-  }
-
-  clear(val) {
-    const timeoutData = this._timeoutData;
-    global.clearTimeout(timeoutData.timeoutId);
-    timeoutData.resolve(val);
-    return this;
-  }
-
-  reset() {
-    const timeoutData = this._timeoutData;
-    global.clearTimeout(timeoutData.timeoutId);
-    timeoutData.timeoutId = global.setTimeout(() => {
-      exec(timeoutData.fn).then(timeoutData.resolve).catch(timeoutData.reject);
-    }, timeoutData.duration);
-    return this;
-  }
-}
-
-const setTimeout = (fn, d = 0) => {
-  return new TimeoutPromise(fn, d);
-};
-
-
-exports = module.exports = setTimeout;
+    TimeoutPromise.prototype.then = function (onfulfilled, onrejected) {
+        var p = new TimeoutPromise(this._promise.then(onfulfilled, onrejected));
+        p._timeoutData = this._timeoutData;
+        return p;
+    };
+    TimeoutPromise.prototype.catch = function (onrejected) {
+        var p = new TimeoutPromise(this._promise.catch(onrejected));
+        p._timeoutData = this._timeoutData;
+        return p;
+    };
+    TimeoutPromise.prototype.finally = function (onfinally) {
+        var p = new TimeoutPromise(this._promise.finally(onfinally));
+        p._timeoutData = this._timeoutData;
+        return p;
+    };
+    TimeoutPromise.prototype.reset = function (duration) {
+        clearTimeout(this._timeoutData.timeoutId);
+        this._timeoutData.timeoutId = global.setTimeout(this._timeoutData.timeoutHandler, duration !== undefined
+            ? duration
+            : this._timeoutData.duration);
+        return this;
+    };
+    TimeoutPromise.prototype.clear = function (fn) {
+        clearTimeout(this._timeoutData.timeoutId);
+        exec_1.exec(fn, this)
+            .then(this._timeoutData.resolve)
+            .catch(this._timeoutData.reject);
+        return this;
+    };
+    return TimeoutPromise;
+}());
 exports.TimeoutPromise = TimeoutPromise;
+function setTimeout(fn, duration) {
+    if (typeof fn === "number") {
+        duration = fn;
+        fn = undefined;
+    }
+    var timeoutData;
+    var timeoutPromise = new TimeoutPromise(function (resolve, reject) {
+        var timeoutHandler = function () {
+            exec_1.exec(fn, timeoutPromise).then(resolve).catch(reject);
+        };
+        timeoutData = {
+            resolve: resolve,
+            reject: reject,
+            timeoutHandler: timeoutHandler,
+            timeoutId: global.setTimeout(timeoutHandler, duration),
+            duration: duration
+        };
+    });
+    timeoutPromise._timeoutData = timeoutData;
+    return timeoutPromise;
+}
+exports.setTimeout = setTimeout;
+exports.default = setTimeout;
